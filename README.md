@@ -11,7 +11,7 @@ This is an Android application that tells you what hapend on today in history.
 luozhouyang0528@gmail.com  
 
 # License  
-Copyright 2015 Luo ZhouYang
+Copyright 2016 Luo ZhouYang
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
