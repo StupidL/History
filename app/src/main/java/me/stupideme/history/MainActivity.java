@@ -1,18 +1,17 @@
 package me.stupideme.history;
 
-import android.app.usage.UsageEvents;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +20,11 @@ import me.stupideme.history.view.SlidingTabLayout;
 
 public class MainActivity extends AppCompatActivity {
     public static Handler mHandler;
-    public static List<Event> today;
-    public static List<Event> yesterday;
-    public static List<Event> beforeyesterday;
-    private Runnable runnable;
+    public static List<Event> today = new ArrayList<>();
+    public static List<Event> yesterday = new ArrayList<>();
+    public static List<Event> beforeyesterday = new ArrayList<>();
+    //public static List<Event> mList = new ArrayList<>();
+    List<Fragment> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,36 +32,48 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
-        mHandler = new Handler();
-        today = new ArrayList<>();
-        yesterday = new ArrayList<>();
-        beforeyesterday = new ArrayList<>();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                startService(new Intent(MainActivity.this, DownloadService.class));
-            }
-        };
-        mHandler.postDelayed(runnable, 0);
+        toolbar.setTitle("历史上的今天");
+        setSupportActionBar(toolbar);
 
-        List<Fragment> list = new ArrayList<>();
+
         list.add(TodayFragment.newInstance(today));
         list.add(YesterdayFragment.newInstance(yesterday));
         list.add(BeforeYesterdayFragment.newInstance(beforeyesterday));
 
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), list);
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), list);
         SlidingTabLayout slidingTabs = (SlidingTabLayout) findViewById(R.id.sliding_tab_layout);
-        slidingTabs.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        slidingTabs.setSelectedIndicatorColors(Color.WHITE);
-        slidingTabs.setCustomTabView(R.layout.item_sliding_tab, 0);//自定义tab布局，为了选项等宽布满tab
-        slidingTabs.setDividerColors(getResources().getColor(R.color.colorPrimary));
-
         ViewPager pager = (ViewPager) findViewById(R.id.view_pager);
-        pager.setAdapter(adapter);
-        slidingTabs.setViewPager(pager);
+        if (pager != null) {
+            pager.setAdapter(adapter);
+        }
+        if (slidingTabs != null) {
+            slidingTabs.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            slidingTabs.setSelectedIndicatorColors(Color.WHITE);
+            slidingTabs.setCustomTabView(R.layout.item_sliding_tab, 0);//自定义tab布局，为了选项等宽布满tab
+            slidingTabs.setDividerColors(getResources().getColor(R.color.colorPrimary));
+            slidingTabs.setViewPager(pager);
+        }
+
+
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                switch (message.what) {
+                    case 0x100:
+                        TodayFragment.adapter.notifyDataSetChanged();
+                        break;
+                    case 0x200:
+                        YesterdayFragment.adapter.notifyDataSetChanged();
+                        break;
+                    case 0x300:
+                        BeforeYesterdayFragment.adapter.notifyDataSetChanged();
+                        break;
+                }
+
+            }
+        };
+
 
     }
 
@@ -77,5 +89,14 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        today.clear();
+        yesterday.clear();
+        beforeyesterday.clear();
+        list.clear();
     }
 }

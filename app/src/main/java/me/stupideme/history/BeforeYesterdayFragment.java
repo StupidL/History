@@ -1,6 +1,7 @@
 package me.stupideme.history;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import java.util.List;
 public class BeforeYesterdayFragment extends Fragment {
 
     private static List<Event> mList;
+    public static ListViewAdapter adapter;
+    public static final String ACTION = "me.stupidme.history.ACTION.BEFORE_YESTERDAY";
 
     public BeforeYesterdayFragment() {
         // Required empty public constructor
@@ -33,6 +36,9 @@ public class BeforeYesterdayFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+        Intent intent = new Intent(getActivity(),DownloadService.class);
+        intent.setAction(ACTION);
+        getActivity().startService(intent);
     }
 
     @Override
@@ -40,7 +46,9 @@ public class BeforeYesterdayFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_before_yesterday, container, false);
         ListView listView = (ListView) view.findViewById(R.id.before_yesterday_list_view);
-        listView.setAdapter(new ListViewAdapter(mList));
+
+        adapter = new ListViewAdapter(mList,getActivity());
+        listView.setAdapter(adapter);
         return view;
     }
 
