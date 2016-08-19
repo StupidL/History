@@ -2,6 +2,7 @@ package me.stupideme.history;
 
 import android.app.IntentService;
 import android.content.Intent;
+
 import java.util.Calendar;
 
 public class DownloadService extends IntentService {
@@ -14,15 +15,15 @@ public class DownloadService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         calendar.add(Calendar.DATE, -1);
-        int month2 = calendar.get(Calendar.MONTH);
+        int month2 = calendar.get(Calendar.MONTH) + 1;
         int day2 = calendar.get(Calendar.DAY_OF_MONTH);
 
         calendar.add(Calendar.DATE, -1);
-        int month3 = calendar.get(Calendar.MONTH);
+        int month3 = calendar.get(Calendar.MONTH) + 1;
         int day3 = calendar.get(Calendar.DAY_OF_MONTH);
 
         String action = intent.getAction();
